@@ -544,6 +544,14 @@ function help(){
   </div>`;
 }
 
+function resetScreen(){
+  return `<div class="stack fade" style="padding-top:28px">
+   <span class="eyebrow">Fresh start</span>
+   <h1>Start the program fresh?</h1>
+   <p>This clears your practice workouts and ratings and takes you back to Week 1, Workout 1. Your program and exercises stay the same.</p>
+   <button class="btn btn-primary" data-act="resetYes">Yes, start fresh</button>
+   <button class="btn btn-secondary" data-act="resetNo">No, keep my progress</button></div>`;
+}
 function render(){
   let html;
   switch(view.name){
@@ -551,6 +559,7 @@ function render(){
     case "saved": html=afterSave(); break;
     case "progress": html=progress(); break;
     case "help": html=help(); break;
+    case "reset": html=resetScreen(); break;
     default: html=home();
   }
   $app.innerHTML=html;
@@ -581,6 +590,8 @@ $app.addEventListener("click",ev=>{
   if(a==="repeat"){S.review=false; S.day=1; if(!S.reps) S.reps={}; S.reps[S.week]=(S.reps[S.week]||0)+1; save(); go({name:"home"}); return;}
   if(a==="newCycle"){S.done=false; S.cycle++; S.week=5; S.day=1; S.reps={}; save(); go({name:"home"}); return;}
   if(a==="saveChecks"){const v1=document.getElementById("c1").value,v2=document.getElementById("c12").value; S.checks={start:v1===""?null:+v1,end:v2===""?null:+v2}; save(); b.textContent="Saved"; return;}
+  if(a==="resetYes"){S=fresh(); save(); go({name:"home"}); return;}
+  if(a==="resetNo"){go({name:"home"}); return;}
   if(a==="setPlace"){S.week=+document.getElementById("selW").value; S.day=+document.getElementById("selD").value; S.review=false; S.done=false; if(!S.reps) S.reps={}; S.reps[S.week]=(S.reps[S.week]||0)+1; save(); go({name:"home"}); return;}
 });
 function keepNote(){const t=document.getElementById("note"); if(t) view.note=t.value;}
@@ -591,6 +602,7 @@ function startTimer(sec,btn){
     if(left<=0){stopTimer(); if(disp) disp.textContent="Done!"; btn.disabled=false; btn.textContent="Start again";}},1000);
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&view.name==="workout") keepAwake(true); else wakeLock=null;});
+{const p=new URLSearchParams(location.search); if(p.get("reset")==="1"){view={name:"reset"}; p.delete("reset"); history.replaceState(null,"",location.pathname+(p.toString()?"?"+p.toString():""));}}
 render();
 </script>
 </body>
